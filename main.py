@@ -69,7 +69,7 @@ CONN_URI = "mongodb+srv://" + secret_user + ":" + secret_passwd + "@mycluster0.p
 
 # CONN_URI = "mongodb://localhost:27017/"
 
-# @st.cache(hash_funcs={MongoClient: id})
+# @st.cache_data(hash_funcs={MongoClient: id})
 # def get_client():
 #     return  MongoClient()
 
@@ -82,12 +82,12 @@ def provide_db_connection(func):
         return result
     return wrapper
 
-@st.cache(suppress_st_warning=True)
+@st.cache_data
 def read_image(program_image_url:str) -> bytes:
     img_data = io.BytesIO(urlopen(program_image_url).read())
     return img_data
 
-@st.cache(suppress_st_warning=True)
+@st.cache_data
 def read_sound_data(program_sound_url:str) -> bytes:
     sound_data = io.BytesIO(urlopen(program_sound_url).read())
     return sound_data
@@ -102,7 +102,7 @@ def to_excel(df):
     output = io.BytesIO()
     writer = pd.ExcelWriter(output, engine='xlsxwriter')
     df.to_excel(writer, sheet_name='Sheet1')
-    writer.save()
+    writer.close()
     processed_data = output.getvalue()
     return processed_data
 
@@ -115,7 +115,7 @@ def get_table_download_link(df):
     b64 = base64.b64encode(val)  # val looks like b'...'
     return f'<a href="data:application/octet-stream;base64,{b64.decode()}" download="extract.xlsx">Download Excel file</a>' # decode b'abc' => abc
 
-@st.cache
+@st.cache_data
 @provide_db_connection
 def read_sidebar_photos(conn) -> bytes:
     global dj_img_datas
@@ -140,7 +140,7 @@ def read_sidebar_photos(conn) -> bytes:
             print('Name duplication error!')
     return dj_img_datas
 
-@st.cache(suppress_st_warning=True)
+@st.cache_data
 def set_hrefs(dj_hrefs:list) -> list:
     htmls = []
     for i, href in enumerate(dj_hrefs):
@@ -159,7 +159,7 @@ def main():
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     </style> """, unsafe_allow_html=True)
-    
+
     padding = 0
     st.markdown(f""" <style>
         .reportview-container .main .block-container{{
